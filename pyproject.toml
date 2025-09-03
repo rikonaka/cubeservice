@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cubeservice"
+version = "0.1.0"
+authors = [
+  { name="RikoNaka", email="xxy1836@gmail.com" },
+]
+description = "Cube service app"
+readme = "README.md"
+requires-python = ">=3.8"
+
+[project.scripts]
+my-script = "cubeservice.app:main"
