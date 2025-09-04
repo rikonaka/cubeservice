@@ -3,7 +3,8 @@ from CubeRaspberryLib3 import Cube
 import time
 import psutil
 
-FAN_WORK_TEMP = 55
+FAN_WORK_TEMP = 50
+SLEEP_TIME = 5.0
 
 
 def oled_job(oled: OLED, temps):
@@ -36,8 +37,9 @@ def fan_job(cube: Cube, temps):
     if highest_temp > FAN_WORK_TEMP:
         # open fan
         cube.set_fan(1)
-        cube.set_rgb_effect(3)
-        cube.set_rgb_speed(1)
+        # cube.set_rgb_effect(3)
+        # cube.set_rgb_speed(1)
+        cube.set_single_color(0, 0, 0, 0)
     else:
         # close fan
         cube.set_fan(0)
@@ -56,7 +58,7 @@ def main():
                 # print(temps)
                 fan_job(cube, temps)
                 oled_job(oled, temps)
-                time.sleep(10)
+                time.sleep(SLEEP_TIME)
         except KeyboardInterrupt:
             oled.clear(True)
             del oled
