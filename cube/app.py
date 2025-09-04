@@ -62,3 +62,7 @@ def main():
             del oled
             del cube
             print("app exit")
+
+
+if __name__ == "__main__":
+    main()

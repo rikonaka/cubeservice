@@ -3,14 +3,18 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "cubeservice"
-version = "0.1.0"
+name = "cube"
+version = "0.1.1"
 authors = [
   { name="RikoNaka", email="xxy1836@gmail.com" },
 ]
 description = "Cube service app"
 readme = "README.md"
 requires-python = ">=3.8"
+dependencies = [
+  "CubeRaspberryLib3>=0.1.7",
+  "psutil>=7.0.0",
+]
 
 [project.scripts]
-my-script = "cubeservice.app:main"
+cube = "cube.app:main"
