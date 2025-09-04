@@ -3,7 +3,7 @@ from CubeRaspberryLib3 import Cube
 import time
 import psutil
 
-FAN_WORK_TEMP = 50
+FAN_WORK_TEMP = 52
 SLEEP_TIME = 2.0
 # MAX LEN is 30
 TEMP_HISTORY = []
@@ -15,11 +15,19 @@ def oled_job(oled: OLED, temps):
     cpu_thermal = temps.get("cpu_thermal")[0]
     nvme = temps.get("nvme")[0]
 
+    high_temp_count = 0
+    for t in TEMP_HISTORY:
+        if t > FAN_WORK_TEMP:
+            high_temp_count += 1
+
     try:
         if oled.clear():
             text = "CPU TEMP: {:.2f}°C".format(cpu_thermal.current)
-            oled.add_row(text=text, row=1)
+            oled.add_row(text=text, row=0)
             text = "NVME TEMP: {:.2f}°C".format(nvme.current)
+            oled.add_row(text=text, row=1)
+            h = high_temp_count / len(TEMP_HISTORY)
+            text = "HIGH: {:.2f}%".format(h * 100.0)
             oled.add_row(text=text, row=2)
             oled.refresh()
         else:
@@ -51,7 +59,8 @@ def fan_job(cube: Cube, temps):
         if t > FAN_WORK_TEMP:
             high_temp_count += 1
 
-    if high_temp_count / len(TEMP_HISTORY) > 0.3:
+    h = high_temp_count / len(TEMP_HISTORY)
+    if h > 0.3:
         if LAST_FAN_STATUS != 1:
             # open fan
             cube.set_fan(1)
