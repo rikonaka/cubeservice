@@ -2,9 +2,13 @@ from CubeRaspberryLib3 import OLED
 from CubeRaspberryLib3 import Cube
 import time
 import psutil
+import sys
+import signal
 
 FAN_WORK_TEMP = 50
 SLEEP_TIME = 5.0
+# MAX LEN is 5
+TEMP_HISTORY = []
 
 
 def oled_job(oled: OLED, temps):
@@ -34,17 +38,28 @@ def fan_job(cube: Cube, temps):
     if nvme.current > highest_temp:
         highest_temp = nvme.currents
 
+    while len(TEMP_HISTORY) > 4:
+        TEMP_HISTORY.pop()
+
+    TEMP_HISTORY.append(highest_temp)
+
     if highest_temp > FAN_WORK_TEMP:
         # open fan
         cube.set_fan(1)
         # cube.set_rgb_effect(3)
         # cube.set_rgb_speed(1)
-        cube.set_single_color(0, 0, 0, 0)
     else:
         # close fan
-        cube.set_fan(0)
-        # close the light
-        cube.set_single_color(0, 0, 0, 0)
+        close_fan = True
+        for t in TEMP_HISTORY:
+            if t > FAN_WORK_TEMP:
+                close_fan = False
+
+        if close_fan:
+            cube.set_fan(0)
+
+    # close the light
+    cube.set_single_color(0, 0, 0, 0)
 
 
 def main():
