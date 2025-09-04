@@ -1,12 +1,13 @@
 from CubeRaspberryLib3 import OLED
 from CubeRaspberryLib3 import Cube
+from collections import deque
 import time
 import psutil
 
 FAN_WORK_TEMP = 52
 SLEEP_TIME = 2.0
 # MAX LEN is 30
-TEMP_HISTORY = []
+TEMP_HISTORY = deque([])
 TEMP_HISTORY_MAX_LEN = 30
 LAST_FAN_STATUS = 100
 
@@ -27,7 +28,7 @@ def oled_job(oled: OLED, temps):
             text = "NVME TEMP: {:.2f}°C".format(nvme.current)
             oled.add_row(text=text, row=1)
             h = high_temp_count / len(TEMP_HISTORY)
-            text = "HIGH: {:.2f}%, LEN: {}".format(h * 100.0, len(TEMP_HISTORY))
+            text = "HIGH: {:.2f}%".format(h * 100.0)
             oled.add_row(text=text, row=2)
             oled.refresh()
         else:
@@ -50,7 +51,7 @@ def fan_job(cube: Cube, temps):
     global LAST_FAN_STATUS
 
     while len(TEMP_HISTORY) > TEMP_HISTORY_MAX_LEN:
-        TEMP_HISTORY.pop()
+        TEMP_HISTORY.popleft()
 
     TEMP_HISTORY.append(highest_temp)
 
