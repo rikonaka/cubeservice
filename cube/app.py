@@ -27,7 +27,7 @@ def oled_job(oled: OLED, temps):
             text = "NVME TEMP: {:.2f}°C".format(nvme.current)
             oled.add_row(text=text, row=1)
             h = high_temp_count / len(TEMP_HISTORY)
-            text = "HIGH: {:.2f}%".format(h * 100.0)
+            text = "HIGH: {:.2f}%, LEN: {}".format(h * 100.0, len(TEMP_HISTORY))
             oled.add_row(text=text, row=2)
             oled.refresh()
         else:
