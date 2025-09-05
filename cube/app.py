@@ -37,7 +37,7 @@ def oled_job(oled: OLED, temps):
         print("run error: {}".format(e))
 
 
-def fan_job(cube: Cube, temps):
+def fan_job(cube: Cube, temps) -> bool:
     cpu_thermal = temps.get("cpu_thermal")[0]
     nvme = temps.get("nvme")[0]
 
@@ -61,6 +61,7 @@ def fan_job(cube: Cube, temps):
             high_temp_count += 1
 
     h = high_temp_count / len(TEMP_HISTORY)
+    light_oled = False
     if h > 0.3:
         if LAST_FAN_STATUS != 1:
             # open fan
@@ -69,6 +70,7 @@ def fan_job(cube: Cube, temps):
             cube.set_rgb_speed(1)
             LAST_FAN_STATUS = 1
             # cube.set_single_color(0, 0, 0, 0)
+        light_oled = True
     else:
         if LAST_FAN_STATUS != 0:
             # close fan
@@ -76,6 +78,9 @@ def fan_job(cube: Cube, temps):
             # close the light
             cube.set_single_color(0, 0, 0, 0)
             LAST_FAN_STATUS = 0
+        light_oled = False
+
+    return light_oled
 
 
 def main():
@@ -87,13 +92,15 @@ def main():
             while True:
                 temps = psutil.sensors_temperatures()
                 # print(temps)
-                fan_job(cube, temps)
-                oled_job(oled, temps)
+                light_oled = fan_job(cube, temps)
+                if light_oled:
+                    oled_job(oled, temps)
+                else:
+                    oled.clear(True)
+
                 time.sleep(SLEEP_TIME)
         except KeyboardInterrupt:
             oled.clear(True)
-            del oled
-            del cube
             print("app exit")
 
 
