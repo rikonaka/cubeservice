@@ -14,16 +14,10 @@ LAST_FAN_STATUS = 100
 LINE_HIGHEST_TEMP = 60
 LINE_LOWEST_TEMP = 48
 
-# CPU_USAGE_HISTORY = deque([])
-# CPU_USAGE_HISTORY_MAX_LEN = 128
-# LINE_HIGHEST_CPU = 100
-# LINE_LOWEST_CPU = 0
-
 
 def update_status():
     global CPU_TEMP_HISTORY
     global SSD_TEMP_HISTORY
-    # global CPU_USAGE_HISTORY
 
     temps = psutil.sensors_temperatures()
     cpu_thermal = temps.get("cpu_thermal")[0]
@@ -38,13 +32,6 @@ def update_status():
         SSD_TEMP_HISTORY.popleft()
 
     SSD_TEMP_HISTORY.append(nvme.current)
-
-    # cpu_percent = psutil.cpu_percent(interval=1.0)
-
-    # while len(CPU_USAGE_HISTORY) > CPU_USAGE_HISTORY_MAX_LEN - 1:
-    #     CPU_USAGE_HISTORY.popleft()
-
-    # CPU_USAGE_HISTORY.append(cpu_percent)
 
 
 def oled_text(oled: OLED):
@@ -109,37 +96,14 @@ def oled_line(oled: OLED):
         elif t < LINE_LOWEST_TEMP:
             new_temp.append((i, 32))
         else:
-            nt = (
-                32
-                - int(
-                    ((t - LINE_LOWEST_TEMP) / (LINE_HIGHEST_TEMP - LINE_LOWEST_TEMP))
-                    * 32
-                )
-                + 0
+            nt = 32 - int(
+                ((t - LINE_LOWEST_TEMP) / (LINE_HIGHEST_TEMP - LINE_LOWEST_TEMP)) * 32
             )
             new_temp.append((i, nt))
-
-    # new_usage = []
-    # for i, c in enumerate(CPU_USAGE_HISTORY):
-    #     # 100 is highest usage
-    #     if c > LINE_HIGHEST_CPU:
-    #         new_usage.append((i, 16))
-    #     elif c < LINE_LOWEST_CPU:
-    #         new_usage.append((i, 32))
-    #     else:
-    #         nc = (
-    #             16
-    #             - int(
-    #                 ((c - LINE_LOWEST_CPU) / (LINE_HIGHEST_CPU - LINE_LOWEST_CPU)) * 16
-    #             )
-    #             + 16
-    #         )
-    #         new_usage.append((i, nc))
 
     try:
         if oled.clear():
             oled.add_line(new_temp)
-            # oled.add_line(new_usage)
             oled.refresh()
         else:
             print("clear screen failed")
