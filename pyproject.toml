@@ -12,7 +12,7 @@ description = "Cube service app"
 readme = "README.md"
 requires-python = ">=3.8"
 dependencies = [
-  "CubeRaspberryLib3>=0.1.7",
+  "CubeRaspberryLib3>=0.1.9",
   "psutil>=7.0.0",
 ]
 
