@@ -155,12 +155,14 @@ def main():
         try:
             while True:
                 update_status()
-                light_oled = fan_job(cube)
-                if light_oled:
-                    oled_text(oled)
-                else:
-                    # oled.clear(True)
-                    oled_line(oled)
+                # light_oled = fan_job(cube)
+                # if light_oled:
+                #     oled_text(oled)
+                # else:
+                #     # oled.clear(True)
+                #     oled_line(oled)
+                _ = fan_job(cube)
+                oled_line(oled)
 
                 if SLEEP_TIME > 0.0:
                     time.sleep(SLEEP_TIME)
