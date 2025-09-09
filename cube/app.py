@@ -94,10 +94,10 @@ def oled_line(oled: OLED):
         if t > LINE_HIGHEST_TEMP:
             new_temp.append((i, 0))
         elif t < LINE_LOWEST_TEMP:
-            new_temp.append((i, 32))
+            new_temp.append((i, 31))
         else:
-            nt = 32 - int(
-                ((t - LINE_LOWEST_TEMP) / (LINE_HIGHEST_TEMP - LINE_LOWEST_TEMP)) * 32
+            nt = 31 - int(
+                ((t - LINE_LOWEST_TEMP) / (LINE_HIGHEST_TEMP - LINE_LOWEST_TEMP)) * 31
             )
             new_temp.append((i, nt))
 
