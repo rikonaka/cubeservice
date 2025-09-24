@@ -12,7 +12,7 @@ SSD_TEMP_HISTORY = deque([])
 SSD_TEMP_HISTORY_MAX_LEN = 128
 LAST_FAN_STATUS = 100
 LINE_HIGHEST_TEMP = 60
-LINE_LOWEST_TEMP = 48
+LINE_LOWEST_TEMP = 40
 
 
 def update_status():
@@ -113,7 +113,7 @@ def oled_line(oled: OLED):
 
 def main():
     cube = Cube()
-    oled = OLED(row_height=10)
+    oled = OLED()
     init_status = oled.init()
     if init_status:
         try:
