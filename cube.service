@@ -5,13 +5,13 @@ After=network.target
 [Service]
 # User and Group to run the service under.
 # Recommend creating a dedicated user for this service.
-User=root
-Group=root
+User=hero
+Group=hero
 
 # The command to start the service.
 # pipx apps are located in ~/.local/bin or similar.
 # Use the full path to the executable.
-ExecStart=/home/user/.local/bin/cube
+ExecStart=/home/hero/.local/bin/cube
 
 # Restart the service if it crashes.
 Restart=on-failure
