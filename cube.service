@@ -5,8 +5,8 @@ After=network.target
 [Service]
 # User and Group to run the service under.
 # Recommend creating a dedicated user for this service.
-User=hero
-Group=hero
+User=root
+Group=root
 
 # The command to start the service.
 # pipx apps are located in ~/.local/bin or similar.
