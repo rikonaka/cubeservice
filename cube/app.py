@@ -13,7 +13,7 @@ SSD_TEMP_HISTORY_MAX_LEN = 256
 LAST_FAN_LIGHT_STATUS = False
 LINE_HIGHEST_TEMP = 60
 LINE_LOWEST_TEMP = 45
-ERROR_LOG_PATH = "/var/log/cube_error.log"
+ERROR_LOG_PATH = "/home/hero/cube_error.log"
 
 
 def log_error(msg: str):
@@ -99,7 +99,7 @@ def oled_text(oled: OLED):
 
 def oled_line(oled: OLED):
     temp_line = []
-    for i, t in enumerate(CPU_TEMP_HISTORY):
+    for i, t in enumerate(list(CPU_TEMP_HISTORY)[-128:]):
         # 60 is highest temp
         if t > LINE_HIGHEST_TEMP:
             temp_line.append((i, 0))
@@ -112,7 +112,6 @@ def oled_line(oled: OLED):
             )
             temp_line.append((i, nt))
 
-    temp_line = temp_line[-128:]
     try:
         if oled.clear():
             oled.add_line(temp_line)
