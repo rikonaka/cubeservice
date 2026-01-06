@@ -122,9 +122,20 @@ def oled_line(oled: OLED):
         log_error("oled display line error: {}".format(e))
 
 
+def fan_init(cube: Cube):
+    global LAST_FAN_LIGHT_STATUS
+    # close fan
+    cube.set_fan(0)
+    # close the light
+    cube.set_single_color(0, 0, 0, 0)
+    LAST_FAN_LIGHT_STATUS = False
+
+
 def main():
     cube = Cube()
     oled = OLED()
+    fan_init(cube)
+
     init_status = oled.init()
     if init_status:
         try:
