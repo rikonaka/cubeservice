@@ -112,6 +112,7 @@ def oled_line(oled: OLED):
             )
             temp_line.append((i, nt))
 
+    temp_line = temp_line[-128:]
     try:
         if oled.clear():
             oled.add_line(temp_line)
