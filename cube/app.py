@@ -4,21 +4,15 @@ from collections import deque
 import time
 import psutil
 
-FAN_WORK_TEMP = 52
+FAN_WORK_TEMP = 55
 SLEEP_TIME = 1.0
 CPU_TEMP_HISTORY = deque([])
 CPU_TEMP_HISTORY_MAX_LEN = 256
 SSD_TEMP_HISTORY = deque([])
 SSD_TEMP_HISTORY_MAX_LEN = 256
-LAST_FAN_LIGHT_STATUS = False
+LAST_FAN_STATUS = False
 LINE_HIGHEST_TEMP = 60
 LINE_LOWEST_TEMP = 45
-ERROR_LOG_PATH = "/home/hero/cube_error.log"
-
-
-def log_error(msg: str):
-    with open(ERROR_LOG_PATH, "a") as f:
-        f.write(msg + "\n")
 
 
 def update_status():
@@ -40,8 +34,18 @@ def update_status():
     SSD_TEMP_HISTORY.append(nvme.current)
 
 
+def light_job(cube: Cube, on: bool):
+    if on:
+        # set breathing light
+        cube.set_rgb_effect(3)
+        cube.set_rgb_speed(1)
+    else:
+        # turn off the light
+        cube.set_single_color(0, 0, 0, 0)
+
+
 def fan_job(cube: Cube) -> bool:
-    global LAST_FAN_LIGHT_STATUS
+    global LAST_FAN_STATUS
 
     high_temp_count = 0
     for t in CPU_TEMP_HISTORY:
@@ -52,27 +56,23 @@ def fan_job(cube: Cube) -> bool:
     # if more than 30% of history temps are higher than FAN_WORK_TEMP, turn on the fan
     if h > 0.3:
         # if fan already on, do nothing
-        if LAST_FAN_LIGHT_STATUS:
+        if LAST_FAN_STATUS:
             pass
         else:
             # open fan
             cube.set_fan(1)
-            cube.set_rgb_effect(3)
-            cube.set_rgb_speed(1)
-            LAST_FAN_LIGHT_STATUS = True
+            LAST_FAN_STATUS = True
     else:
         # if fan already on, close it
-        if LAST_FAN_LIGHT_STATUS:
+        if LAST_FAN_STATUS:
             # close fan
             cube.set_fan(0)
-            # close the light
-            cube.set_single_color(0, 0, 0, 0)
-            LAST_FAN_LIGHT_STATUS = False
+            LAST_FAN_STATUS = False
         else:
             # fan already off, do nothing
             pass
 
-    return LAST_FAN_LIGHT_STATUS
+    return LAST_FAN_STATUS
 
 
 def oled_text(oled: OLED):
@@ -92,9 +92,9 @@ def oled_text(oled: OLED):
             oled.add_row(text=text, row=2)
             oled.refresh()
         else:
-            log_error("clear screen failed")
+            print("clear screen failed")
     except Exception as e:
-        log_error("oled display text error: {}".format(e))
+        print("oled display text error: {}".format(e))
 
 
 def oled_line(oled: OLED):
@@ -117,18 +117,18 @@ def oled_line(oled: OLED):
             oled.add_line(temp_line)
             oled.refresh()
         else:
-            log_error("clear screen failed")
+            print("clear screen failed")
     except Exception as e:
-        log_error("oled display line error: {}".format(e))
+        print("oled display line error: {}".format(e))
 
 
 def fan_init(cube: Cube):
-    global LAST_FAN_LIGHT_STATUS
+    global LAST_FAN_STATUS
     # close fan
     cube.set_fan(0)
     # close the light
     cube.set_single_color(0, 0, 0, 0)
-    LAST_FAN_LIGHT_STATUS = False
+    LAST_FAN_STATUS = False
 
 
 def main():
@@ -141,19 +141,26 @@ def main():
         try:
             while True:
                 update_status()
-                is_oled_on = fan_job(cube)
-                if is_oled_on:
+                big_fan_on = fan_job(cube)
+                print(
+                    "OLED: {}, CPU TEMP: {:.2f}°C, SSD TEMP: {:.2f}°C".format(
+                        big_fan_on, CPU_TEMP_HISTORY[-1], SSD_TEMP_HISTORY[-1]
+                    )
+                )
+                if big_fan_on:
                     # show text when fan is working
                     oled_text(oled)
+                    light_job(cube, True)
                 else:
                     # show line graph when fan is not working
                     oled_line(oled)
+                    light_job(cube, False)
 
                 if SLEEP_TIME > 0.0:
                     time.sleep(SLEEP_TIME)
         except KeyboardInterrupt:
             oled.clear(True)
-            log_error("app exit")
+            print("app exit")
 
 
 if __name__ == "__main__":
