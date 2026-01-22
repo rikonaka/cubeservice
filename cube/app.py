@@ -146,7 +146,7 @@ def fan_init(cube: Cube):
 
 
 def main():
-    cube = Cube()
+    cube = Cube(delay=0.5)
     oled = OLED()
     fan_init(cube)
 
