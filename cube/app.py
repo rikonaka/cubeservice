@@ -22,9 +22,8 @@ def check_status(cube: Cube, oled: OLED):
     if display_mode == "line":
         if fan_state == 1:
             # line mode but fan on and light on, need to turn off light
-            # cube.set_rgb(0)
             cube.set_fan(0)
-            cube.set_single_color(0, 0, 0, 0)
+            cube.set_rgb_off()
 
 
 def update_status():
@@ -50,14 +49,12 @@ def light_job(cube: Cube, on: bool):
     if on:
         # set breathing light
         print("light on")
-        # cube.set_rgb(1)
         cube.set_rgb_effect(3)
         cube.set_rgb_speed(1)
     else:
         # turn off the light
         print("light off")
-        cube.set_single_color(0, 0, 0, 0)
-        # cube.set_rgb(0)
+        cube.set_rgb_off()
 
 
 def fan_job(cube: Cube) -> bool:
@@ -144,8 +141,7 @@ def fan_init(cube: Cube):
     # close fan
     cube.set_fan(0)
     # close the light
-    cube.set_single_color(0, 0, 0, 0)
-    # cube.set_rgb(0)
+    cube.set_rgb_off()
     LAST_FAN_STATUS = False
 
 
